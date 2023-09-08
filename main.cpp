@@ -5,7 +5,9 @@
 #include <chrono>
 #include <fstream>
 #include <filesystem>
+
 using namespace std;
+namespace fs = std::filesystem;
 
 vector<string> loadWordsFromFile(const string &filename)
 {
@@ -34,18 +36,13 @@ vector<string> loadWordsFromFile(const string &filename)
     return words;
 }
 
-int main(int argc, char **argv)
+void printUsage()
 {
-    if (argc < 3)
-    {
-        cerr << "Usage: main.exe -t <number_of_tokens> [-f <filename>]" << endl;
-        return 1;
-    }
+    cerr << "Usage: main.exe -t <number_of_tokens> [-f <filename>]" << endl;
+}
 
-    double numTokens = 0.0;
-    string filename;
-    vector<string> words;
-
+void processCommandLineArguments(int argc, char **argv, double &numTokens, string &filename)
+{
     for (int i = 1; i < argc; ++i)
     {
         if (string(argv[i]) == "-t" && i + 1 < argc)
@@ -57,36 +54,56 @@ int main(int argc, char **argv)
             filename = argv[i + 1];
         }
     }
+}
 
+bool validateCommandLineArguments(double numTokens, const string &filename)
+{
     if (numTokens <= 0)
     {
         cerr << "Invalid number of tokens" << endl;
-        return 1;
+        return false;
     }
-
-    words = {"Hello", "world", "This", "is", "a", "sample", "output", "from", "the", "program.", "Let's", "see", "how", "it", "works.", "Let's", "see", "how", "fast", "it", "goes."};
 
     if (!filename.empty())
     {
-        if (!filesystem::exists(filename))
+        if (!fs::exists(filename))
         {
             cerr << "Error: File does not exist: " << filename << endl;
-            return 1;
+            return false;
         }
 
-        if (!filesystem::is_regular_file(filename))
+        if (!fs::is_regular_file(filename))
         {
             cerr << "Error: Not a regular file: " << filename << endl;
-            return 1;
+            return false;
         }
-
-        words = loadWordsFromFile(filename);
     }
 
-    if (words.empty())
+    return true;
+}
+
+int main(int argc, char **argv)
+{
+    double numTokens = 0.0;
+    string filename;
+
+    processCommandLineArguments(argc, argv, numTokens, filename);
+
+    if (argc < 3 || !validateCommandLineArguments(numTokens, filename))
     {
-        cerr << "Error: Failed to load words from the file or no default words provided." << endl;
+        printUsage();
         return 1;
+    }
+
+    vector<string> words;
+
+    if (!filename.empty())
+    {
+        words = loadWordsFromFile(filename);
+    }
+    else
+    {
+        words = {"Hello", "world", "This", "is", "a", "sample", "output", "from", "the", "program.", "Let's", "see", "how", "it", "works.", "Let's", "see", "how", "fast", "it", "goes."};
     }
 
     int delayDuration = static_cast<int>((1.0 / numTokens) * 1000000);
