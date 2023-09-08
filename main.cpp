@@ -11,6 +11,13 @@ vector<string> loadWordsFromFile(const string &filename)
 {
     vector<string> words;
     ifstream file(filename);
+
+    if (!file.is_open())
+    {
+        cerr << "Error: Failed to open file: " << filename << endl;
+        exit(1);
+    }
+
     string word;
 
     while (file >> word)
@@ -18,8 +25,15 @@ vector<string> loadWordsFromFile(const string &filename)
         words.push_back(word);
     }
 
+    if (file.bad())
+    {
+        cerr << "Error: Error reading from file: " << filename << endl;
+        exit(1);
+    }
+
     return words;
 }
+
 int main(int argc, char **argv)
 {
     if (argc < 3)
@@ -52,8 +66,20 @@ int main(int argc, char **argv)
 
     words = {"Hello", "world", "This", "is", "a", "sample", "output", "from", "the", "program.", "Let's", "see", "how", "it", "works.", "Let's", "see", "how", "fast", "it", "goes."};
 
-    if (!filename.empty() && filesystem::exists(filename) && filesystem::is_regular_file(filename))
+    if (!filename.empty())
     {
+        if (!filesystem::exists(filename))
+        {
+            cerr << "Error: File does not exist: " << filename << endl;
+            return 1;
+        }
+
+        if (!filesystem::is_regular_file(filename))
+        {
+            cerr << "Error: Not a regular file: " << filename << endl;
+            return 1;
+        }
+
         words = loadWordsFromFile(filename);
     }
 
@@ -62,6 +88,7 @@ int main(int argc, char **argv)
         cerr << "Error: Failed to load words from the file or no default words provided." << endl;
         return 1;
     }
+
     int delayDuration = static_cast<int>((1.0 / numTokens) * 1000000);
 
     while (true)
