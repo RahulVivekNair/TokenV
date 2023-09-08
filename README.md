@@ -4,8 +4,6 @@
 
 This is a small command-line utility to visualize the generation of tokens by a language model (LLM) on the console. It provides a simple way to observe how tokens are generated at a specified speed.
 
-![Demo](demo.gif)
-
 ## Features
 
 - Load tokens from a file or use a default set of tokens.
