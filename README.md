@@ -22,5 +22,5 @@ This is a small command-line utility to visualize the generation of tokens by a 
 
 1. Generate tokens at a rate of 2 tokens per second:
    `./token-generator -t 2`
-2. Generate tokens at a rate of 10 tokens per second with words.txt as source:
+2. Generate tokens with words.txt as source:
    `./token-generator -t 10 -f words.txt`
